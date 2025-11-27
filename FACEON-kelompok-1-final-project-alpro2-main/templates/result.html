@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Results - faceon{% endblock %}
+
+{% block content %}
+<section class="result-section">
+    <div class="container">
+        <div class="result-header">
+            <h1>RESULTS.</h1>
+        </div>
+
+        <div class="result-card">
+            <div class="result-content">
+                <div class="face-display">
+                    <div class="face-label">FACE</div>
+                    {% if request.args.get('image_url') %}
+                        <img src="{{ request.args.get('image_url') }}" alt="Detected Face" class="face-image">
+                    {% else %}
+                        <div class="face-placeholder">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    {% endif %}
+                    <div class="emotion-summary">
+                        {% set emotion_map_eng = {
+                            'Senang': 'happiness',
+                            'Netral': 'neutral',
+                            'Terkejut': 'surprise',
+                            'Sedih': 'sadness',
+                            'Jijik': 'disgust',
+                            'Marah': 'anger',
+                            'Takut': 'fear'
+                        } %}
+                        {% set emotion_eng = emotion_map_eng.get(emotion, 'happiness') %}
+                        {% set confidence_num = (confidence|float * 100)|int if confidence else 0 %}
+                        Emotion of this detected face is most likely to be <strong>{{ emotion_eng }}</strong>, with the highest possibility of <strong>{{ confidence_num }}%</strong>.
+                    </div>
+                </div>
+                <div class="emotion-breakdown">
+                    <h3>Emotion Analysis</h3>
+                    <div class="emotion-list">
+                        {% set emotion_map = {
+                            'Senang': 'HAPPINESS',
+                            'Netral': 'NEUTRAL',
+                            'Terkejut': 'SURPRISE',
+                            'Sedih': 'SADNESS',
+                            'Jijik': 'DISGUST',
+                            'Marah': 'ANGER',
+                            'Takut': 'FEAR'
+                        } %}
+                        {% set emotions_list = [
+                            ('HAPPINESS', 'Senang'),
+                            ('NEUTRAL', 'Netral'),
+                            ('SURPRISE', 'Terkejut'),
+                            ('SADNESS', 'Sedih'),
+                            ('DISGUST', 'Jijik'),
+                            ('ANGER', 'Marah'),
+                            ('FEAR', 'Takut')
+                        ] %}
+                        {% for emotion_name, emotion_id in emotions_list %}
+                            {% set emo_value = 0 %}
+                            {% if emotion == emotion_id %}
+                                {% set emo_value = confidence|float * 100 %}
+                            {% endif %}
+                            <div class="emotion-item-breakdown">
+                                <div class="emotion-label">{{ emotion_name }}</div>
+                                <div class="emotion-bar-container">
+                                    <div class="emotion-bar" style="width: {{ emo_value }}%;"></div>
+                                </div>
+                                <div class="emotion-percentage">{{ emo_value|int }}%</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="result-actions">
+                <a href="{{ url_for('upload_page') }}" class="btn btn-primary">TRY AGAIN</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
