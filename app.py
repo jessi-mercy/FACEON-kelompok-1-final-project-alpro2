@@ -1,93 +1,131 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, url_for
 import os
+import uuid
 from werkzeug.utils import secure_filename
-from predict import predict_image, fallback_predict_image
+from flask_cors import CORS
+import tensorflow as tf
+from preprocess import preprocess_image
+import json
 
+# --------------------------------------------------------
+# CONFIG
+# --------------------------------------------------------
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'static/uploads'
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+CORS(app)
 
-# Ensure upload directory exists
+# Pastikan folder ini benar (di dalam folder static)
+app.config['UPLOAD_FOLDER'] = 'static/uploads' 
+app.config['PREDICTION_FOLDER'] = 'static/predictions'
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB
+
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+os.makedirs(app.config['PREDICTION_FOLDER'], exist_ok=True)
+
+# --------------------------------------------------------
+# LOAD MODEL
+# --------------------------------------------------------
+MODEL_PATH = "model/fer2013_mobilenetv2_final.h5"
+
+print("Loading model...")
+# Pastikan path model benar
+if os.path.exists(MODEL_PATH):
+    model = tf.keras.models.load_model(MODEL_PATH)
+    print("Model loaded successfully.")
+else:
+    print(f"ERROR: Model file not found at {MODEL_PATH}")
+
+EMOTION_LABELS = [
+    "angry",
+    "disgust",
+    "fear",
+    "happy",
+    "neutral",
+    "sad",
+    "surprise"
+]
+
+# --------------------------------------------------------
+# ROUTES HALAMAN HTML
+# --------------------------------------------------------
 
 @app.route('/')
 def home():
-    return render_template('home.html')
+    return render_template('home.html') # Pastikan ada file home.html atau ganti ke upload.html
 
 @app.route('/about')
 def about():
-    return render_template('about.html')
+    return render_template('about.html') # Pastikan ada file about.html
 
 @app.route('/upload')
 def upload_page():
     return render_template('upload.html')
 
+# Route ini sebenarnya opsional sekarang, karena /predict langsung render result.html
 @app.route('/result')
 def result_page():
-    emotion = request.args.get('emotion', 'Tidak Dikenali')
-    confidence = request.args.get('confidence', '0')
-    return render_template('result.html', emotion=emotion, confidence=confidence)
+    return render_template('result.html')
+
+# --------------------------------------------------------
+# ROUTE PREDICT (INTI PROGRAM)
+# --------------------------------------------------------
 
 @app.route('/predict', methods=['POST'])
 def predict():
+    # 1. Cek Input File
+    # Pastikan di HTML <input name="image">. Jika name="file", ganti 'image' jadi 'file' di bawah ini.
     if 'image' not in request.files:
-        return jsonify({'error': 'Tidak ada gambar yang diunggah'}), 400
+        return "Tidak ada gambar yang diunggah (Cek name input di HTML)", 400
 
     file = request.files['image']
     if file.filename == '':
-        return jsonify({'error': 'Nama file kosong'}), 400
+        return "Nama file kosong", 400
 
-    # Save uploaded file
-    filename = secure_filename(file.filename)
-    path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    file.save(path)
+    # 2. Simpan File
+    ext = file.filename.rsplit('.', 1)[-1].lower()
+    filename = f"{uuid.uuid4().hex}.{ext}"
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(filename))
+    
+    file.save(filepath)
 
+    # 3. Preprocessing & Prediksi
     try:
-        # Try to predict with main model
-        result = predict_image(path)
+        img_array = preprocess_image(filepath)
+        preds = model.predict(img_array)[0]
+
+        emotion_index = preds.argmax()
+        emotion = EMOTION_LABELS[emotion_index]
+        confidence = float(preds[emotion_index])
+
+        # 4. Siapkan Data Lengkap untuk Progress Bar
+        # Dictionary: {'angry': 0.1, 'happy': 0.8, ...}
+        all_predictions = {EMOTION_LABELS[i]: float(preds[i]) for i in range(7)}
+
+        # (Opsional) Simpan JSON log history
+        json_name = f"{uuid.uuid4().hex}.json"
+        json_path = os.path.join(app.config['PREDICTION_FOLDER'], json_name)
+        with open(json_path, "w") as f:
+            json.dump({
+                "emotion": emotion,
+                "confidence": confidence,
+                "all_predictions": all_predictions
+            }, f, indent=4)
+
+        # 5. Render Template (JANGAN HAPUS FOTO)
+        # Kita kirim semua data yang dibutuhkan result.html
+        return render_template(
+            'result.html', 
+            emotion=emotion, 
+            confidence=confidence, 
+            all_predictions=all_predictions, # <--- PENTING UNTUK BAR PERSENTASE
+            image_url=url_for('static', filename=f'uploads/{filename}') # <--- PENTING UNTUK GAMBAR
+        )
+
     except Exception as e:
-        # Clean up file if prediction fails
-        if os.path.exists(path):
-            os.remove(path)
-        return jsonify({'error': f'Prediksi gagal: {str(e)}'}), 500
+        print(f"Error: {e}")
+        return f"Terjadi kesalahan saat memproses gambar: {str(e)}", 500
 
-    # Clean up uploaded file after prediction
-    if os.path.exists(path):
-        os.remove(path)
-
-    # Handle different result formats
-    if isinstance(result, tuple):
-        if len(result) == 3:
-            label, confidence, annotated_image = result
-            return jsonify({
-                'emotion': label,
-                'confidence': round(confidence, 2),
-                'image_url': annotated_image
-            })
-        else:
-            label, confidence = result
-            return jsonify({
-                'emotion': label, 
-                'confidence': round(confidence, 2)
-            })
-
-    # If result is string (error), try fallback
-    if isinstance(result, str):
-        # Try fallback prediction
-        try:
-            fallback_result = fallback_predict_image(path)
-            if isinstance(fallback_result, tuple):
-                label, confidence = fallback_result
-                return jsonify({
-                    'emotion': label, 
-                    'confidence': round(confidence, 2)
-                })
-            else:
-                return jsonify({'error': fallback_result}), 200
-        except Exception as fallback_error:
-            return jsonify({'error': f'Kedua prediksi gagal: {str(fallback_error)}'}), 500
-
-    return jsonify({'error': 'Format hasil prediksi tidak diharapkan'}), 500
-
+# --------------------------------------------------------
+# RUN SERVER
+# --------------------------------------------------------
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,4 +1,4 @@
-// File upload and prediction handling for faceon
+// File upload handling for faceon (FINAL FIXED VERSION)
 
 document.addEventListener('DOMContentLoaded', function() {
     const uploadForm = document.getElementById('upload-form');
@@ -10,15 +10,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const cameraBtn = document.getElementById('camera-btn');
     const loadingElement = document.getElementById('loading');
 
-    // Upload button handler
+    // 1. Tombol Upload Biasa
     if (uploadBtn && fileInput) {
         uploadBtn.addEventListener('click', () => fileInput.click());
     }
 
-    // File upload handling
+    // 2. Logika Drag & Drop + Preview
     if (uploadArea && fileInput) {
+        // Klik area kotak untuk buka file selector
         uploadArea.addEventListener('click', () => fileInput.click());
         
+        // Efek visual saat drag file
         uploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
             uploadArea.style.borderColor = '#9370DB';
@@ -30,14 +32,22 @@ document.addEventListener('DOMContentLoaded', function() {
             uploadArea.style.background = '';
         });
         
+        // Saat file dilepas (Drop)
         uploadArea.addEventListener('drop', (e) => {
             e.preventDefault();
+            // Reset style
+            uploadArea.style.borderColor = '#ADB5BD';
+            uploadArea.style.background = '';
+
             const files = e.dataTransfer.files;
             if (files.length > 0) {
+                // PENTING: Masukkan file ke input form agar ikut terkirim saat submit
+                fileInput.files = files; 
                 handleFileSelection(files[0]);
             }
         });
         
+        // Saat file dipilih manual lewat tombol
         fileInput.addEventListener('change', (e) => {
             if (e.target.files.length > 0) {
                 handleFileSelection(e.target.files[0]);
@@ -45,6 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Fungsi Preview Gambar
     function handleFileSelection(file) {
         if (file) {
             const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
@@ -58,83 +69,60 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            // Display preview
+            // Tampilkan preview
             const reader = new FileReader();
             reader.onload = function(e) {
                 previewImage.src = e.target.result;
                 previewImage.style.display = 'block';
+                
+                // Sembunyikan placeholder icon kamera
                 const placeholder = uploadArea.querySelector('.image-placeholder-box');
                 if (placeholder) {
                     placeholder.style.display = 'none';
                 }
-                analyzeBtn.disabled = false;
+                
+                analyzeBtn.disabled = false; // Aktifkan tombol Analyze
             };
             reader.readAsDataURL(file);
         }
     }
 
-    // Camera button handler (will be handled by camera.js)
+    // Camera button handler (tetap sama)
     if (cameraBtn) {
         cameraBtn.addEventListener('click', function() {
             const cameraModal = document.getElementById('camera-modal');
-            if (cameraModal) {
-                cameraModal.style.display = 'flex';
-            }
+            if (cameraModal) cameraModal.style.display = 'flex';
         });
     }
 
-    // Close camera modal
     const closeCameraBtn = document.getElementById('close-camera');
     if (closeCameraBtn) {
         closeCameraBtn.addEventListener('click', function() {
             const cameraModal = document.getElementById('camera-modal');
-            if (cameraModal) {
-                cameraModal.style.display = 'none';
-            }
+            if (cameraModal) cameraModal.style.display = 'none';
         });
     }
 
-    // Form submission
+    // 3. Form Submission (BAGIAN UTAMA YANG DIPERBAIKI)
     if (uploadForm) {
-        uploadForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
+        uploadForm.addEventListener('submit', function(e) {
             
+            // Cek dulu apakah file sudah dipilih
             if (!fileInput.files || !fileInput.files.length) {
+                e.preventDefault(); // Batalkan submit cuma kalau file kosong
                 alert('Please select an image file first');
                 return;
             }
 
-            const formData = new FormData();
-            formData.append('image', fileInput.files[0]);
+            // JIKA FILE ADA: 
+            // HAPUS LOGIKA FETCH / JSON.
+            // Biarkan browser mengirim data secara alami ke Flask (Server Side Rendering).
 
-            try {
-                // Show loading
-                loadingElement.style.display = 'block';
-                analyzeBtn.disabled = true;
-
-                const response = await fetch('/predict', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const data = await response.json();
-
-                if (data.emotion) {
-                    // Redirect to results page
-                    const confidence = typeof data.confidence === 'number' ? data.confidence : parseFloat(data.confidence);
-                    window.location.href = `/result?emotion=${encodeURIComponent(data.emotion)}&confidence=${confidence}`;
-                } else {
-                    throw new Error(data.error || 'Prediction failed');
-                }
-
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error analyzing image: ' + error.message);
-            } finally {
-                loadingElement.style.display = 'none';
-                analyzeBtn.disabled = false;
-            }
+            // Cukup tampilkan loading agar user tahu proses sedang berjalan
+            if (loadingElement) loadingElement.style.display = 'block';
+            if (analyzeBtn) analyzeBtn.disabled = true;
+            
+            // Selesai. Browser akan reload dan pindah ke halaman Result otomatis.
         });
     }
-
 });

@@ -9,10 +9,10 @@
         <div class="hero-masks">
             <div class="mask-container">
                 <div class="mask mask-gold">
-                    <div class="mask-pattern mask-pattern-gold"></div>
+                    <img src="{{ url_for('static', filename='images/home3.jpg') }}" class="mask-img">
                 </div>
                 <div class="mask mask-blue">
-                    <div class="mask-pattern mask-pattern-blue"></div>
+                    <img src="{{ url_for('static', filename='images/home5.jpg') }}" class="mask-img">
                 </div>
             </div>
         </div>
@@ -35,8 +35,8 @@
                 <p>Emotion recognition or emotion detection software is a technology that uses artificial intelligence (AI) and machine learning algorithms to analyze and interpret facial expressions and emotions. <span class="highlight">faceon</span> enables users to learn people's emotions by analyzing facial features. We create emotional intelligence that provides a deeper understanding.</p>
             </div>
             <div class="what-we-do-image">
-                <div class="image-placeholder">
-                    <p>7 EMOTIONS IMAGE</p>
+                <div>
+                    <img src="{{ url_for('static', filename='images/home2.jpg') }}" class="mask-img">
                 </div>
                 <div class="image-controls">
                     <button class="carousel-btn prev"><i class="fas fa-chevron-left"></i></button>
@@ -58,22 +58,22 @@
         <h2>POTENTIAL USE CASES</h2>
         <div class="use-cases-grid">
             <div class="use-case-card">
-                <div class="use-case-image">
-                    <div class="image-placeholder-small"></div>
+                <div>
+                    <img src="{{ url_for('static', filename='images/customer.png') }}" class="mask-img">
                 </div>
                 <h3>Customer Service</h3>
                 <p>Analyze emotions to tailor responses and personalize service, improving satisfaction and loyalty.</p>
             </div>
             <div class="use-case-card">
-                <div class="use-case-image">
-                    <div class="image-placeholder-small"></div>
+                <div>
+                    <img src="{{ url_for('static', filename='images/health.png') }}" class="mask-img">
                 </div>
                 <h3>Healthcare</h3>
                 <p>Enhance caregiver-patient interactions by interpreting emotional cues through telemedicine platforms.</p>
             </div>
             <div class="use-case-card">
-                <div class="use-case-image">
-                    <div class="image-placeholder-small"></div>
+                <div>
+                    <img src="{{ url_for('static', filename='images/education.jpg') }}" class="mask-img">
                 </div>
                 <h3>Education</h3>
                 <p>Use emotional feedback to identify stress or disengagement, allowing for timely intervention and support to enhance learning outcomes.</p>
@@ -90,18 +90,20 @@
             <div class="feature-item">
                 <div class="feature-number">01</div>
                 <div class="feature-content">
-                    <h3>Customer Service</h3>
-                    <p>Analyze emotions to tailor responses and personalize service, improving satisfaction and loyalty.</p>
+                    <p>Real-Time Emotion Detection</p>
                 </div>
-                <div class="feature-image-placeholder"></div>
+                <div>
+                    <img src="{{ url_for('static', filename='images/realtime.png') }}" class="mask-img">
+                </div>
             </div>
             <div class="feature-item">
                 <div class="feature-number">02</div>
                 <div class="feature-content">
-                    <h3>Customer Service</h3>
-                    <p>Analyze emotions to tailor responses and personalize service, improving satisfaction and loyalty.</p>
+                    <p>Emotion Insights Dashboard</p>
                 </div>
-                <div class="feature-image-placeholder"></div>
+                <div>
+                    <img src="{{ url_for('static', filename='images/emotionbar.png') }}" class="mask-img">
+                </div>
             </div>
         </div>
     </div>

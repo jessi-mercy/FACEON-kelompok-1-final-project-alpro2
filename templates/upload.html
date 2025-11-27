@@ -2,7 +2,7 @@
 
 {% block title %}Demo - faceon{% endblock %}
 
-{% block content %}
+{% block content %} 
 <section class="upload-section">
     <div class="container">
         <div class="section-header">
@@ -11,7 +11,7 @@
         
         <div class="upload-container">
             <div class="upload-card">
-                <form id="upload-form" enctype="multipart/form-data">
+                <form id="upload-form" action="{{ url_for('predict') }}" method="POST" enctype="multipart/form-data">
                     <input type="file" id="file-input" name="image" accept="image/*" hidden>
                     <div class="image-preview-area" id="upload-area">
                         <div class="image-placeholder-box">

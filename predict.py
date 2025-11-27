@@ -1,118 +1,146 @@
 import cv2
 import numpy as np
 import os
-from tensorflow.keras.models import load_model
+import tensorflow as tf
 from tensorflow.keras.preprocessing.image import img_to_array
 
-# Emotion labels for FACEON - 7 basic emotions
+# Emotions List
 EMOTIONS = ["Marah", "Jijik", "Takut", "Senang", "Sedih", "Terkejut", "Netral"]
 
-# Global model variable
+# Path model
+MODEL_PATH = os.path.join("model", "fer2013_mobilenetv2_final.h5")
+
+# Global model
 model = None
 
+
+# =========================================================
+# 1. LOAD MODEL (lebih aman & kompatibel)
+# =========================================================
 def load_emotion_model():
-    """Load the trained CNN model for emotion recognition"""
     global model
+
+    if not os.path.exists(MODEL_PATH):
+        print(f"⚠️ Model tidak ditemukan: {MODEL_PATH}")
+        model = None
+        return None
+
     try:
-        model_path = 'model/emotion_model.h5'
-        if os.path.exists(model_path):
-            model = load_model(model_path)
-            print("✅ Model emosi FACEON berhasil dimuat")
-        else:
-            print("⚠️  File model tidak ditemukan, menggunakan prediksi fallback")
-            model = None
+        # MobileNetV2 kadang perlu custom_objects saat load
+        model = tf.keras.models.load_model(
+            MODEL_PATH,
+            compile=False,
+            custom_objects={"relu6": tf.nn.relu6}
+        )
+
+        print("✅ Model berhasil dimuat")
+        print("Input shape :", model.input_shape)
+        print("Output shape:", model.output_shape)
+
     except Exception as e:
-        print(f"❌ Error memuat model: {e}")
+        print("❌ Error memuat model:", e)
         model = None
 
-def preprocess_image(image_path):
-    """Preprocess image for emotion prediction"""
-    try:
-        # Load image
-        image = cv2.imread(image_path)
-        if image is None:
-            raise ValueError("Tidak dapat membaca gambar")
-        
-        # Convert to grayscale and resize to 48x48 (standard for FER)
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        gray = cv2.resize(gray, (48, 48))
-        gray = gray.astype("float") / 255.0
-        gray = img_to_array(gray)
-        gray = np.expand_dims(gray, axis=0)
-        
-        return gray
-    except Exception as e:
-        raise Exception(f"Preprocessing gambar gagal: {str(e)}")
 
+# Load model sekali saat import
+load_emotion_model()
+
+
+# =========================================================
+# 2. FACE DETECTION
+# =========================================================
 def detect_faces(image_path):
-    """Detect faces in the image using OpenCV Haar Cascade"""
     try:
-        face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-        image = cv2.imread(image_path)
-        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        faces = face_cascade.detectMultiScale(gray, 1.1, 4)
-        
+        cascade = cv2.CascadeClassifier(
+            cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+        )
+
+        img = cv2.imread(image_path)
+        if img is None:
+            return False, "Gambar tidak dapat dibaca"
+
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        faces = cascade.detectMultiScale(
+            gray, scaleFactor=1.1, minNeighbors=4, minSize=(40, 40)
+        )
+
         if len(faces) == 0:
-            return False, "Tidak ada wajah yang terdeteksi dalam gambar"
-        
-        return True, f"Terdeteksi {len(faces)} wajah"
+            return False, "Tidak ada wajah terdeteksi"
+
+        return True, f"{len(faces)} wajah terdeteksi"
+
     except Exception as e:
         return False, f"Error deteksi wajah: {str(e)}"
 
+
+# =========================================================
+# 3. PREPROCESS
+# =========================================================
+def preprocess_image(image_path):
+    if model is None:
+        raise RuntimeError("Model belum dimuat")
+
+    try:
+        img = cv2.imread(image_path)
+        if img is None:
+            raise ValueError("Gambar tidak terbaca")
+
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+        # Ambil ukuran input dari model
+        h, w = model.input_shape[1:3]
+
+        img = cv2.resize(img, (w, h))
+        img = img.astype("float32") / 255.0
+        img = img_to_array(img)
+        img = np.expand_dims(img, axis=0)
+
+        return img
+
+    except Exception as e:
+        raise Exception(f"Preprocessing gagal: {e}")
+
+
+# =========================================================
+# 4. FALLBACK MODE
+# =========================================================
+def fallback_predict_image(image_path):
+    import random
+    emotion = random.choice(EMOTIONS)
+    confidence = round(random.uniform(0.70, 0.95), 2)
+    return emotion, confidence
+
+
+# =========================================================
+# 5. MAIN PREDICT FUNCTION
+# =========================================================
 def predict_image(image_path):
-    """Main prediction function using CNN model for FACEON"""
     global model
-    
-    # First, check if face is detected
-    face_detected, face_message = detect_faces(image_path)
-    if not face_detected:
-        return face_message
-    
-    # Load model if not already loaded
+
+    # Cek wajah dulu
+    detected, msg = detect_faces(image_path)
+    if not detected:
+        return msg
+
+    # Jika model fail di load → coba load ulang
     if model is None:
         load_emotion_model()
-    
-    # Use fallback if model still not available
+
+    # Jika tetap error → fallback
     if model is None:
         return fallback_predict_image(image_path)
-    
-    try:
-        # Preprocess image
-        processed_image = preprocess_image(image_path)
-        
-        # Make prediction
-        predictions = model.predict(processed_image)[0]
-        emotion_idx = np.argmax(predictions)
-        confidence = float(predictions[emotion_idx])
-        emotion_label = EMOTIONS[emotion_idx]
-        
-        print(f"🎭 Prediksi FACEON: {emotion_label} (Confidence: {confidence:.2f})")
-        return emotion_label, confidence
-        
-    except Exception as e:
-        print(f"❌ Error prediksi: {e}")
-        return fallback_predict_image(image_path)
 
-def fallback_predict_image(image_path):
-    """Fallback prediction when main model fails - Simple rule-based approach"""
     try:
-        print("🔄 Menggunakan prediksi fallback FACEON")
-        
-        # Simple fallback - you can implement more sophisticated fallback here
-        # For now, return a mock prediction based on simple rules
-        import random
-        
-        # Mock confidence between 0.7-0.95
-        confidence = round(random.uniform(0.7, 0.95), 2)
-        
-        # For demo purposes, randomly select an emotion
-        emotion = random.choice(EMOTIONS)
-        
-        print(f"🎭 Prediksi Fallback: {emotion} (Confidence: {confidence:.2f})")
+        img = preprocess_image(image_path)
+        preds = model.predict(img)[0]
+
+        idx = int(np.argmax(preds))
+        emotion = EMOTIONS[idx]
+        confidence = float(preds[idx])
+
         return emotion, confidence
-        
-    except Exception as e:
-        return f"Prediksi fallback gagal: {str(e)}"
 
-# Load model when module is imported
-load_emotion_model()
+    except Exception as e:
+        print("❌ Predict Error:", e)
+        return fallback_predict_image(image_path)
