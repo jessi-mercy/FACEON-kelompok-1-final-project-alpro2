@@ -49,7 +49,7 @@ html {
 
 /* Base body styles */
 body {
-  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family: 'Cabin', 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
   line-height: 1.6;
   color: var(--white);
   background: var(--dark-bg);
@@ -187,14 +187,27 @@ header {
 /* Navigation bar container */
 .navbar {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   padding: 1rem 2rem;
 }
 
+.nav-brand {
+  flex: 1;
+}
+
+.nav-links {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 2rem;
+}
+
 /* Logo styling */
 .logo {
-  font-size: 1.75rem;
+  font-family: 'IM Fell Double Pica', serif;
+  font-size: 36px;
   font-weight: 800;
   color: var(--primary);
   text-decoration: none;
@@ -242,92 +255,44 @@ header {
 
 /* Hero section container */
 .hero {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  background: var(--dark-bg);
-  position: relative;
-  overflow: hidden;
-  padding-top: 80px;
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding-top: 120px;
+    overflow: hidden;
 }
 
-/* Hero content container */
-.hero .container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  z-index: 2;
-  text-align: center;
+/* Spline jadi background */
+.spline-wrapper {
+    position: absolute;
+    top: -13%;
+    left: 48%;
+    transform: translateX(-50%) scale(0.8);
+    z-index: 1;
+    pointer-events: none;
 }
 
-/* Mask display container */
-.hero-masks {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin-bottom: 3rem;
+.spline-wrapper spline-viewer {
+    transform: scale(0.9);
+    transform-origin: center top;
+    margin-left: 80px;
 }
 
-/* Mask container dengan flex layout */
-.mask-container {
-  display: flex;
-  gap: 3rem;
-  align-items: center;
-}
-
-/* Base mask styles */
-.mask {
-  width: 300px;
-  height: 400px;
-  border-radius: 20px;
-  position: relative;
-  overflow: hidden;
-}
-
-/* Gold mask variant */
-.mask-gold {
-  background: linear-gradient(135deg, #FFD700, #FFA500);
-}
-
-/* Blue mask variant */
-.mask-blue {
-  background: linear-gradient(135deg, #1e3a5f, #0f1b2e);
-}
-
-/* Mask pattern overlay */
-.mask-pattern {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  opacity: 0.3;
-}
-
-/* Gold mask pattern */
-.mask-pattern-gold {
-  background: 
-    repeating-linear-gradient(90deg, transparent, transparent 20px, rgba(255,255,255,0.1) 20px, rgba(255,255,255,0.1) 40px),
-    repeating-linear-gradient(0deg, transparent, transparent 20px, rgba(255,255,255,0.1) 20px, rgba(255,255,255,0.1) 40px);
-}
-
-/* Blue mask pattern */
-.mask-pattern-blue {
-  background: 
-    radial-gradient(circle at 20% 50%, rgba(147, 112, 219, 0.5) 0%, transparent 50%),
-    radial-gradient(circle at 80% 50%, rgba(147, 112, 219, 0.3) 0%, transparent 50%);
-}
-
-/* Hero text content */
+/* Hero text di depan spline */
 .hero-content {
-  color: var(--white);
-  text-align: center;
-  max-width: 800px;
+    position: relative;
+    z-index: 5;
+    text-align: center;
+    max-width: 1200px;
+    margin-top: 360px;
 }
 
 /* Hero heading */
 .hero-content h1 {
-  font-size: 4rem;
+  font-size: 42px;
   margin-bottom: 1.5rem;
   color: var(--white);
   font-weight: 700;
@@ -337,10 +302,14 @@ header {
 
 /* Hero paragraph */
 .hero-content p {
-  font-size: 1.25rem;
+  font-size: 72px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
   margin-bottom: 2.5rem;
   color: rgba(255, 255, 255, 0.9);
-  line-height: 1.8;
+  line-height: 1.4;
+  max-width: 520px;
 }
 
 /* Hero buttons container */
@@ -348,6 +317,8 @@ header {
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
+  justify-content: center;
+  text-align: center;
 }
 
 /* Hero image container */
@@ -1310,8 +1281,8 @@ footer {
 /* Footer content container */
 .footer-content {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  justify-content: center;
+  align-items: center;
   margin-bottom: 2rem;
   flex-wrap: wrap;
   gap: 3rem;
@@ -1442,16 +1413,6 @@ footer {
     flex-direction: column;
     text-align: center;
     gap: 2rem;
-  }
-  
-  .mask-container {
-    flex-direction: column;
-    gap: 2rem;
-  }
-  
-  .mask {
-    width: 250px;
-    height: 300px;
   }
   
   .hero-content h1 {

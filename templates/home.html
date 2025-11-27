@@ -5,27 +5,19 @@
 {% block content %}
 <!-- Hero Section -->
 <section class="hero">
-    <div class="container">
-        <div class="hero-masks">
-            <div class="mask-container">
-                <div class="mask mask-gold">
-                    <img src="{{ url_for('static', filename='images/home3.jpg') }}" class="mask-img">
-                </div>
-                <div class="mask mask-blue">
-                    <img src="{{ url_for('static', filename='images/home5.jpg') }}" class="mask-img">
-                </div>
-            </div>
-        </div>
-        <div class="hero-content">
-            <h1>UNDERSTAND PEOPLE'S EMOTION.</h1>
-            <p>Get deeper insights into your audience using Artificial Intelligence technology.</p>
-            <div class="hero-buttons">
-                <a href="{{ url_for('upload_page') }}" class="btn btn-primary">TRY DEMO FOR FREE</a>
-            </div>
+=======
+    <div class="spline-wrapper">
+        <spline-viewer url="https://prod.spline.design/8c4hLJNQm5p8EIFC/scene.splinecode"></spline-viewer>
+    </div>
+    <div class="hero-content">
+        <h1>UNDERSTAND PEOPLE'S EMOTION</h1>
+        <p>Get deeper insights into your audience using Artificial Intelligence technology.</p>
+        <div class="hero-buttons">
+            <a href="{{ url_for('upload_page') }}" class="btn btn-primary">TRY DEMO FOR FREE</a>
+>>>>>>> e274a85 (Update base.html, home.html, landing.css, and style.css)
         </div>
     </div>
 </section>
-
 <!-- What We Do Section -->
 <section id="features" class="what-we-do">
     <div class="container">
