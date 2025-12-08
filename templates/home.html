@@ -74,61 +74,155 @@
 </section>
 
 <!-- Features Section -->
-<section id="solution" class="features">
+<section id="solution" class="features-section">
     <div class="container">
-        <h2>OUR FEATURES</h2>
-        <div class="features-list">
-            <div class="feature-item">
+        <h2 class="section-title">Our Features</h2>
+
+        <div class="features-grid">
+
+            <!-- Feature 1 -->
+            <div class="feature-card">
                 <div class="feature-number">01</div>
-                <div class="feature-content">
-                    <p>Real-Time Emotion Detection</p>
+
+                <div class="feature-text">
+                    <h3>Real-Time Emotion Detection</h3>
+                    <p>Analyze facial expressions instantly using our advanced AI model.</p>
                 </div>
-                <div>
-                    <img src="{{ url_for('static', filename='images/realtime.png') }}" class="mask-img">
+
+                <div class="feature-image">
+                    <img src="{{ url_for('static', filename='images/realtime.png') }}" alt="Real-Time Detection">
                 </div>
             </div>
-            <div class="feature-item">
+
+            <!-- Feature 2 -->
+            <div class="feature-card">
                 <div class="feature-number">02</div>
-                <div class="feature-content">
-                    <p>Emotion Insights Dashboard</p>
+
+                <div class="feature-text">
+                    <h3>Emotion Insights Dashboard</h3>
+                    <p>View detailed emotion analytics to understand behavior patterns.</p>
                 </div>
-                <div>
-                    <img src="{{ url_for('static', filename='images/emotionbar.png') }}" class="mask-img">
+
+                <div class="feature-image">
+                    <img src="{{ url_for('static', filename='images/emotionbar.png') }}" alt="Emotion Dashboard">
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- Testimony Section -->
+<section class="testimony" id="testimony">
+    <div class="container">
+        <h2 class="section-title">TESTIMONIALS</h2>
+
+        <!-- Slider -->
+        <div class="testimony-slider">
+            <button class="slide-btn prev">&#10094;</button>
+
+            <div class="testimony-wrapper"> 
+                {% for t in testimonies %}
+                <div class="testimony-card">
+                    <p>"{{ t.msg }}"</p>
+                    <h4>- {{ t.name }}</h4>
+                </div>
+                {% endfor %}
+            </div>
+
+            <button class="slide-btn next">&#10095;</button>
+        </div>
+
+        <!-- Add Testimony -->
+        <div class="add-testimony">
+            <h3>Leave Your Testimony</h3>
+            <form id="testimony-form" action="{{ url_for('add_testimony') }}" method="POST">
+                <input type="text" name="name" placeholder="Your name" required />
+                <textarea name="message" placeholder="Your testimony..." required></textarea>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+
+        <!-- Vision + Trusted -->
+        <div class="vision-trusted">
+            <div class="vision-section">
+                <h3>Our Vision</h3>
+                <p>To revolutionize human-computer interaction by understanding emotion.</p>
+            </div>
+
+            <div class="trusted-section">
+                <h3>Trusted By</h3>
+                <div class="trusted-logos">
+                    <img src="{{ url_for('static', filename='images/satya.png') }}" />
+                    <img src="{{ url_for('static', filename='images/satya.png') }}" />
+                    <img src="{{ url_for('static', filename='images/satya.png') }}" />
+                    <img src="{{ url_for('static', filename='images/satya.png') }}" />
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Testimony Section -->
-<section class="testimony">
-    <div class="container">
-        <h2>TESTIMONY</h2>
-        <div class="testimony-cards">
-            <div class="testimony-card">
-                <p>Analyze emotions to tailor responses and personalize service, improving satisfaction and loyalty.</p>
-            </div>
-            <div class="testimony-card">
-                <p>Analyze emotions to tailor responses and personalize service, improving satisfaction and loyalty.</p>
-            </div>
-            <div class="testimony-card">
-                <p>Analyze emotions to tailor responses and personalize service, improving satisfaction and loyalty.</p>
-            </div>
-        </div>
-        <div class="vision-trusted">
-            <div class="vision-section">
-                <h3>Our Vision</h3>
-                <p>Analyze emotions to tailor responses and personalize service, improving satisfaction and loyalty.</p>
-            </div>
-            <div class="trusted-section">
-                <h3>Trusted by</h3>
-                <div class="trusted-logos">
-                    <div class="logo-placeholder"></div>
-                    <div class="logo-placeholder"></div>
-                    <div class="logo-placeholder"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const sections = document.querySelectorAll("section[id]");
+    const scrollLinks = document.querySelectorAll(".scroll-link");
+
+    if (window.location.pathname !== "/") return;
+
+    window.addEventListener("scroll", () => {
+        let currentSection = "";
+
+        sections.forEach(section => {
+            const top = section.offsetTop - 150;
+            const height = section.offsetHeight;
+
+            if (window.scrollY >= top && window.scrollY < top + height) {
+                currentSection = section.getAttribute("id");
+            }
+        });
+
+        scrollLinks.forEach(link => {
+            link.classList.remove("active");
+            if (link.getAttribute("href") === "#" + currentSection) {
+                link.classList.add("active");
+            }
+        });
+    });
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const wrapper = document.querySelector(".testimony-wrapper");
+    const nextBtn = document.querySelector(".slide-btn.next");
+    const prevBtn = document.querySelector(".slide-btn.prev");
+
+    console.log("Slider loaded:", wrapper, nextBtn, prevBtn);
+
+    let index = 0;
+
+    function updateSlider() {
+        wrapper.scrollTo({
+            left: wrapper.clientWidth * index,
+            behavior: "smooth"
+        });
+    }
+
+    if (nextBtn && prevBtn && wrapper) {
+        nextBtn.addEventListener("click", () => {
+            console.log("NEXT CLICKED");
+            index = Math.min(index + 1, wrapper.children.length - 1);
+            updateSlider();
+        });
+
+        prevBtn.addEventListener("click", () => {
+            console.log("PREV CLICKED");
+            index = Math.max(index - 1, 0);
+            updateSlider();
+        });
+    }
+});
+</script>
+
 {% endblock %}

@@ -36,6 +36,14 @@
     text-align: center;
 }
 
+.mask-img{
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
 .mockup-img {
     max-width: 100%;
     border-radius: 12px;
@@ -84,6 +92,81 @@
     color: var(--text-color);
 }
 
+/* FEATURES SECTION */
+.features-section {
+    padding: 80px 0;
+    text-align: center;
+}
+
+.section-title {
+    font-size: 2.4rem;
+    font-weight: 700;
+    margin-bottom: 40px;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 40px;
+    align-items: stretch;
+    justify-content: center;
+}
+
+.feature-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    transition: 0.3s ease;
+    position: relative;
+}
+
+.feature-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+}
+
+.feature-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #c59bff;
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+.feature-text h3 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #4b2e83;
+    margin-bottom: 6px;
+}
+
+.feature-text p {
+    font-size: 0.95rem;
+    color: #777;
+    line-height: 1.4;
+}
+
+.feature-image {
+    margin-top: 20px;
+}
+
+.feature-image img {
+    width: 100%;
+    max-width: 280px;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    transition: 0.3s ease;
+}
+
+.feature-card:hover img {
+    transform: scale(1.05);
+}
+
 /* How It Works Section */
 .how-it-works {
     padding: 80px 0;
@@ -125,6 +208,125 @@
 .step-content h3 {
     margin-bottom: 0.5rem;
     color: var(--text-color);
+}
+
+/* Testimony Section */
+.testimony {
+    padding: 100px 0;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.section-title {
+    text-align: center;
+    font-size: 48px;
+    margin-bottom: 40px;
+    font-weight: 700;
+}
+
+/* Slider Layout */
+.testimony-slider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.testimony-wrapper {
+    display: flex;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    width: 100%;
+}
+
+.testimony-card {
+    min-width: 100%;
+    flex-shrink: 0;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+
+.testimony-card p {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: black;
+    font-style: italic
+}
+
+.testimony-card h4 {
+    font-weight: 600;
+    color: #6c63ff;
+}
+
+/* Slider Buttons */
+.slide-btn {
+    background: #6c63ff;
+    border: none;
+    color: white;
+    font-size: 26px;
+    padding: 10px 16px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.slide-btn:hover {
+    background: #554bdc;
+}
+
+/* Add Testimony Form */
+.add-testimony {
+    margin-top: 40px;
+    text-align: center;
+}
+
+#testimony-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+}
+
+#testimony-form input,
+#testimony-form textarea {
+    width: 80%;
+    max-width: 500px;
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+
+#testimony-form button {
+    padding: 12px 30px;
+    background: #6c63ff;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 20px
+}
+
+#testimony-form button:hover {
+    background: #554bdc;
+}
+
+/* Trusted By */
+.trusted-logos img {
+    width: 60px;          
+    height: 60px;        
+    border-radius: 50%;  
+    object-fit: cover;    
+    margin: 0 10px;       
+    border: 2px solid #fff; 
+
+}
+
+.trusted-logos img:hover {
+    opacity: 1;
 }
 
 /* Emotions Section */

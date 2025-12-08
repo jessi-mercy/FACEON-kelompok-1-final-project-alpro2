@@ -1,10 +1,11 @@
-# frontend_app.py  (Laptop Frontend)
-from flask import Flask, render_template, request, url_for
+# frontend_app.py  (Laptop Frontend - FIXED)
+from flask import Flask, render_template, request, url_for, redirect
 import os
 import uuid
 from werkzeug.utils import secure_filename
 from flask_cors import CORS
 import requests
+import csv  # <-- Wajib ada untuk baca/tulis testimoni
 
 app = Flask(__name__)
 CORS(app)
@@ -14,16 +15,36 @@ app.config["UPLOAD_FOLDER"] = os.path.join("static", "uploads")
 app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024  # 16MB
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
-# GANTI IP INI dengan IP Laptop Predict di jaringan Wi-Fi
-BACKEND_PREDICT_URL = "http://192.168.1.10:5000/predict"   # contoh
+# Nama file CSV untuk frontend
+CSV_FILE = "testimonies.csv"
 
+# GANTI IP INI dengan IP Laptop Predict di jaringan Wi-Fi
+BACKEND_PREDICT_URL = "http://192.168.1.10:5000/predict"   # Pastikan IP ini benar
+
+# --------------------- FUNGSI BANTUAN CSV --------------------
+
+def load_testimonies():
+    """Membaca data testimoni dari CSV lokal di frontend"""
+    testimonies = []
+    
+    if not os.path.exists(CSV_FILE):
+        return []
+
+    # Menggunakan utf-8-sig dan skipinitialspace agar data bersih
+    with open(CSV_FILE, newline="", encoding="utf-8-sig") as f:
+        reader = csv.DictReader(f, skipinitialspace=True)
+        for row in reader:
+            if row and row.get('name') and row.get('msg'):
+                testimonies.append(row)
+    return testimonies
 
 # --------------------- ROUTES HALAMAN --------------------
 
-
 @app.route("/")
 def home():
-    return render_template("home.html")
+    # Load testimoni agar tidak error di home.html
+    testimonies = load_testimonies()
+    return render_template("home.html", testimonies=testimonies)
 
 
 @app.route("/about")
@@ -38,13 +59,50 @@ def upload_page():
 
 @app.route("/result")
 def result_page():
-    # route ini dipakai kalau kamu mau akses langsung, tapi
-    # biasanya result dikirim dari /predict di bawah
+    # Biasanya result ditampilkan via render_template di dalam fungsi predict
     return render_template("result.html")
 
 
-# --------------------- ROUTE PREDICT ---------------------
+# --------------------- ROUTE TESTIMONY (YANG HILANG) --------------------
 
+@app.route("/add_testimony", methods=["POST"])
+def add_testimony():
+    """Menangani input testimoni dari form di home.html"""
+    try:
+        name = request.form["name"]
+        msg = request.form["message"]
+
+        # 1. Cek Enter di akhir file (supaya data tidak menempel)
+        if os.path.exists(CSV_FILE) and os.stat(CSV_FILE).st_size > 0:
+            with open(CSV_FILE, "r+", encoding="utf-8") as f:
+                content = f.read()
+                if not content.endswith('\n'):
+                    f.write('\n')
+
+        # 2. Cek Header
+        file_exists = os.path.isfile(CSV_FILE)
+        is_empty = False
+        if file_exists:
+            is_empty = os.stat(CSV_FILE).st_size == 0
+
+        # 3. Tulis Data
+        with open(CSV_FILE, "a", newline="", encoding="utf-8") as f:
+            fieldnames = ['name', 'msg']
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+
+            if not file_exists or is_empty:
+                writer.writeheader()
+
+            writer.writerow({'name': name, 'msg': msg})
+
+        return redirect(url_for('home'))
+
+    except Exception as e:
+        print(f"Error saving testimony: {e}")
+        return redirect(url_for('home'))
+
+
+# --------------------- ROUTE PREDICT ---------------------
 
 @app.route("/predict", methods=["POST"])
 def predict():

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, url_for
+from flask import Flask, render_template, request, jsonify, url_for, redirect, url_for
 import os
 import uuid
 from werkzeug.utils import secure_filename
@@ -6,6 +6,7 @@ from flask_cors import CORS
 import tensorflow as tf
 from preprocess import preprocess_image
 import json
+import csv
 
 # --------------------------------------------------------
 # CONFIG
@@ -48,9 +49,10 @@ EMOTION_LABELS = [
 # ROUTES HALAMAN HTML
 # --------------------------------------------------------
 
-@app.route('/')
+@app.route("/")
 def home():
-    return render_template('home.html') # Pastikan ada file home.html atau ganti ke upload.html
+    testimonies = load_testimonies()
+    return render_template("home.html", testimonies=testimonies)
 
 @app.route('/about')
 def about():
@@ -64,6 +66,27 @@ def upload_page():
 @app.route('/result')
 def result_page():
     return render_template('result.html')
+
+
+# ROUTE TESTIMONY
+def load_testimonies():
+    testimonies = []
+    with open("testimonies.csv", newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            testimonies.append(row)
+    return testimonies
+
+@app.route("/add_testimony", methods=["POST"])
+def add_testimony():
+    name = request.form["name"]
+    msg = request.form["message"]
+
+    with open("testimonies.csv", "a", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow([name, msg])
+
+    return redirect("/")
 
 # --------------------------------------------------------
 # ROUTE PREDICT (INTI PROGRAM)

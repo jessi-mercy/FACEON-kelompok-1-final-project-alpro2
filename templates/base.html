@@ -20,12 +20,12 @@
             <div class="nav-brand">
                 <a href="{{ url_for('home') }}" class="logo">faceon</a>
             </div>
-            <ul class="nav-links">
-                <li><a href="{{ url_for('home') }}" class="{% if request.endpoint == 'home' %}active{% endif %}">WHAT WE DO</a></li>
-                <li><a href="#problem" class="{% if request.endpoint == 'problem' %}active{% endif %}">THE PROBLEM</a></li>
-                <li><a href="#solution" class="{% if request.endpoint == 'solution' %}active{% endif %}">THE SOLUTION</a></li>
-                <li><a href="{{ url_for('about') }}" class="{% if request.endpoint == 'about' %}active{% endif %}">ABOUT US</a></li>
-            </ul>
+                <ul class="nav-links">
+                    <li><a href="#features" class="scroll-link">WHAT WE DO</a></li>
+                    <li><a href="#problem" class="scroll-link">THE PROBLEM</a></li>
+                    <li><a href="#solution" class="scroll-link">THE SOLUTION</a></li>
+                    <li><a href="{{ url_for('about') }}" class="page-link {% if request.endpoint == 'about' %}active{% endif %}">ABOUT US</a></li>
+                </ul>
         </nav>
     </header>
         
