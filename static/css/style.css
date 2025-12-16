@@ -1,6 +1,4 @@
-/* ============================================
-  CSS VARIABLES & RESET
-   ============================================ */
+/* CSS VARIABLES & RESET */
 
 /* Variabel warna utama */
 :root {
@@ -63,9 +61,7 @@ body {
   padding: 0 20px;
 }
 
-/* ============================================
-   TYPOGRAPHY
-   ============================================ */
+/* TYPOGRAPHY */
 
 /* Base heading styles */
 h1, h2, h3, h4, h5, h6 {
@@ -99,9 +95,7 @@ p {
   color: var(--gray);
 }
 
-/* ============================================
-  BUTTONS
-   ============================================ */
+/* BUTTONS */
 
 /* Base button styles */
 .btn {
@@ -169,9 +163,7 @@ p {
   font-size: 1.1rem;
 }
 
-/* ============================================
-  HEADER & NAVIGATION
-   ============================================ */
+/* HEADER & NAVIGATION */
 
 /* Fixed header */
 header {
@@ -249,9 +241,7 @@ header {
   color: var(--white);
 }
 
-/* ============================================
-   HERO SECTION
-   ============================================ */
+/* HERO SECTION */
 
 /* Hero section container */
 .hero {
@@ -265,7 +255,6 @@ header {
     overflow: hidden;
 }
 
-/* Spline jadi background */
 .spline-wrapper {
     position: absolute;
     top: -13%;
@@ -281,7 +270,16 @@ header {
     margin-left: 80px;
 }
 
-/* Hero text di depan spline */
+.spline-cover {
+    position: absolute;
+    bottom: 40px;
+    right: 0;
+    width: 260px;
+    height: 90px;
+    background: var(--dark-bg);
+    pointer-events: none;
+}
+
 .hero-content {
     position: relative;
     z-index: 5;
@@ -349,11 +347,8 @@ header {
   50% { transform: translateY(-20px); }
 }
 
-/* ============================================
-   WHAT WE DO SECTION
-   ============================================ */
+/* WHAT WE DO SECTION */
 
-/* What we do section */
 .what-we-do {
   padding: var(--section-padding);
   background: var(--dark-bg);
@@ -444,9 +439,7 @@ header {
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* ============================================
-   USE CASES SECTION
-   ============================================ */
+/* USE CASES SECTION */
 
 /* Use cases section */
 .use-cases {
@@ -501,11 +494,8 @@ header {
   line-height: 1.6;
 }
 
-/* ============================================
-   FEATURES SECTION
-   ============================================ */
+/* FEATURES SECTION */
 
-/* Features section */
 .features {
   padding: var(--section-padding);
   background: var(--dark-bg);
@@ -562,11 +552,8 @@ header {
   width: 100%;
 }
 
-/* ============================================
-   TESTIMONY SECTION
-   ============================================ */
+/* TESTIMONY SECTION */
 
-/* Testimony section */
 .testimony {
   padding: var(--section-padding);
   background: var(--dark-bg);
@@ -639,9 +626,7 @@ header {
   opacity: 0.5;
 }
 
-/* ============================================
-   HOW IT WORKS SECTION
-   ============================================ */
+/* HOW IT WORKS SECTION */
 
 /* How it works section dengan background putih */
 .how-it-works {
@@ -707,11 +692,8 @@ header {
   color: var(--gray);
 }
 
-/* ============================================
-   EMOTIONS SECTION
-   ============================================ */
+/* EMOTIONS SECTION */
 
-/* Emotions section */
 .emotions {
   padding: var(--section-padding);
   background: var(--light);
@@ -790,9 +772,7 @@ header {
   margin: 0;
 }
 
-/* ============================================
-   UPLOAD SECTION
-   ============================================ */
+/* UPLOAD SECTION */
 
 /* Upload section */
 .upload-section {
@@ -879,9 +859,7 @@ header {
   flex-wrap: wrap;
 }
 
-/* ============================================
-   CAMERA MODAL
-   ============================================ */
+/* CAMERA MODAL */
 
 /* Camera modal overlay */
 .camera-modal {
@@ -958,9 +936,7 @@ header {
   flex-wrap: wrap;
 }
 
-/* ============================================
-   LOADING STATES
-   ============================================ */
+/* LOADING STATES */
 
 /* Loading state container */
 .loading-state {
@@ -986,11 +962,8 @@ header {
   100% { transform: rotate(360deg); }
 }
 
-/* ============================================
-   RESULT SECTION
-   ============================================ */
+/* RESULT SECTION */
 
-/* Result section */
 .result-section {
   padding: var(--section-padding-large);
   min-height: 100vh;
@@ -1145,11 +1118,8 @@ header {
   border-top: 1px solid var(--light);
 }
 
-/* ============================================
-   ABOUT SECTION
-   ============================================ */
+/* ABOUT SECTION */
 
-/* About section */
 .about-section {
   padding: var(--section-padding-large);
   background: var(--dark-bg);
@@ -1267,11 +1237,8 @@ header {
   color: var(--gray);
 }
 
-/* ============================================
-   FOOTER
-   ============================================ */
+/* FOOTER */
 
-/* Footer */
 footer {
   background: var(--primary);
   color: var(--white);
@@ -1340,9 +1307,7 @@ footer {
   color: rgba(255, 255, 255, 0.8);
 }
 
-/* ============================================
-   UTILITY CLASSES
-   ============================================ */
+/* UTILITY CLASSES */
 
 /* Text alignment */
 .text-center { text-align: center; }
@@ -1357,9 +1322,7 @@ footer {
 .mt-2 { margin-top: 2rem; }
 .mt-3 { margin-top: 3rem; }
 
-/* ============================================
-   ANIMATIONS
-   ============================================ */
+/* ANIMATIONS */
 
 /* Fade in up animation */
 @keyframes fadeInUp {
@@ -1378,9 +1341,7 @@ footer {
   animation: fadeInUp 0.6s ease-out;
 }
 
-/* ============================================
-   SCROLLBAR STYLING
-   ============================================ */
+/* SCROLLBAR STYLING */
 
 /* Custom scrollbar width */
 ::-webkit-scrollbar {
@@ -1403,9 +1364,7 @@ footer {
   background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
 }
 
-/* ============================================
-   RESPONSIVE DESIGN
-   ============================================ */
+/* RESPONSIVE DESIGN */
 
 @media (max-width: 768px) {
   /* Hero responsive */

@@ -1,11 +1,10 @@
-# frontend_app.py  (Laptop Frontend - FIXED)
 from flask import Flask, render_template, request, url_for, redirect
 import os
 import uuid
 from werkzeug.utils import secure_filename
 from flask_cors import CORS
 import requests
-import csv  # <-- Wajib ada untuk baca/tulis testimoni
+import csv
 
 app = Flask(__name__)
 CORS(app)
@@ -19,7 +18,7 @@ os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 CSV_FILE = "testimonies.csv"
 
 # GANTI IP INI dengan IP Laptop Predict di jaringan Wi-Fi
-BACKEND_PREDICT_URL = "http://192.168.1.10:5000/predict"   # Pastikan IP ini benar
+BACKEND_PREDICT_URL = "http://192.168.1.10:5000/predict"
 
 # --------------------- FUNGSI BANTUAN CSV --------------------
 
