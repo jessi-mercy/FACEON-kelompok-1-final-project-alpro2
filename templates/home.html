@@ -5,9 +5,11 @@
 {% block content %}
 <!-- Hero Section -->
 <section class="hero">
-=======
-    <div class="spline-wrapper">
-        <spline-viewer url="https://prod.spline.design/8c4hLJNQm5p8EIFC/scene.splinecode"></spline-viewer>
+    <div class="spline-wrapper" style="height: 100%">
+        <script type="module" src="https://unpkg.com/@splinetool/viewer@1.9.0/build/spline-viewer.js"></script>
+        <spline-viewer url="{{ url_for('static', filename='scene.splinecode') }}"></spline-viewer>
+        <div class="spline-cover"></div>
+    </div>
     </div>
     <div class="hero-content">
         <h1>UNDERSTAND PEOPLE'S EMOTION</h1>
