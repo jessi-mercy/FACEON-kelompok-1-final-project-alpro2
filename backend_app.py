@@ -1,23 +1,20 @@
-# backend_app.py  (Laptop Predict)
 from flask import Flask, request, jsonify
 import os
 import uuid
 from werkzeug.utils import secure_filename
 import tensorflow as tf
-from preprocess import preprocess_image  # pakai preprocess.py milikmu
+from preprocess import preprocess_image 
 import json
 
 app = Flask(__name__)
 
-# Folder lokal di Laptop Predict
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['PREDICTION_FOLDER'] = 'predictions'
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  
 
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs(app.config['PREDICTION_FOLDER'], exist_ok=True)
 
-# --------------------- LOAD MODEL ------------------------
 MODEL_PATH = "model/fer2013_mobilenetv2_final.h5"
 
 print("Loading model on backend...")
@@ -38,9 +35,6 @@ EMOTION_LABELS = [
     "surprise"
 ]
 
-# --------------------- ROUTES API ------------------------
-
-
 @app.route("/health", methods=["GET"])
 def health():
     return "ok", 200
@@ -57,7 +51,7 @@ def predict():
         "all_predictions": {...}
     }
     """
-    # Cek apakah ada file
+
     file = request.files.get("image") or request.files.get("file")
     if file is None:
         return jsonify({"error": "Tidak ada file 'image' atau 'file' di request"}), 400
@@ -65,14 +59,12 @@ def predict():
     if file.filename == "":
         return jsonify({"error": "Nama file kosong"}), 400
 
-    # Simpan file ke folder uploads backend
     ext = file.filename.rsplit(".", 1)[-1].lower()
     filename = f"{uuid.uuid4().hex}.{ext}"
     filepath = os.path.join(app.config["UPLOAD_FOLDER"],
                             secure_filename(filename))
     file.save(filepath)
 
-    # Prediksi
     if model is None:
         return jsonify({"error": "Model tidak ditemukan di server backend"}), 500
 
@@ -89,7 +81,6 @@ def predict():
             for i in range(len(EMOTION_LABELS))
         }
 
-        # Simpan log JSON (opsional)
         json_name = f"{uuid.uuid4().hex}.json"
         json_path = os.path.join(app.config["PREDICTION_FOLDER"], json_name)
 
@@ -101,15 +92,12 @@ def predict():
                 "image_filename": filename
             }, f, indent=4)
 
-        # === HAPUS FILE GAMBAR & JSON SETELAH SELESAI ===
         try:
             if os.path.exists(filepath):
                 os.remove(filepath)
             if os.path.exists(json_path):
                 os.remove(json_path)
         except Exception as cleanup_err:
-            # cuma print ke console biar tau kalau gagal hapus,
-            # tapi jangan ganggu response ke client
             print("Gagal menghapus file:", cleanup_err)
 
         return jsonify({
@@ -120,7 +108,6 @@ def predict():
 
     except Exception as e:
         print("Error saat memproses gambar:", e)
-        # kalau mau, di sini juga kamu bisa coba hapus filepath kalau sudah ada
         try:
             if os.path.exists(filepath):
                 os.remove(filepath)
@@ -130,5 +117,4 @@ def predict():
         return jsonify({"error": f"Terjadi kesalahan saat memproses gambar: {str(e)}"}), 500
 
 if __name__ == "__main__":
-    # host=0.0.0.0 supaya bisa diakses dari laptop lain di jaringan Wi-Fi
     app.run(host="0.0.0.0", port=5000, debug=True)
